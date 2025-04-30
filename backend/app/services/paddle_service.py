@@ -2,6 +2,7 @@
 
 from typing import List
 from app.models import PaddleLocation
+from app.models import PaddleUpdate
 
 paddle_db: List[PaddleLocation] = []
 next_id = 1
@@ -23,6 +24,22 @@ def update_paddle(paddle_id: int, updated_paddle: PaddleLocation) -> PaddleLocat
             updated_paddle.created_at = paddle.created_at
             paddle_db[index] = updated_paddle
             return updated_paddle
+    raise ValueError("Paddle log not found")
+
+def patch_paddle(paddle_id: int, patch: PaddleUpdate) -> PaddleLocation:
+    for index, paddle in enumerate(paddle_db):
+        if paddle.id == paddle_id:
+            updated_data = paddle.model_dump()
+            patch_data = patch.model_dump(exclude_unset=True)
+            updated_data.update(patch_data)
+
+            updated_paddle = PaddleLocation(**updated_data)
+            updated_paddle.id = paddle.id
+            updated_paddle.created_at = paddle.created_at
+
+            paddle_db[index] = updated_paddle
+            return updated_paddle
+
     raise ValueError("Paddle log not found")
 
 def delete_paddle(paddle_id: int) -> None:

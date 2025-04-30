@@ -17,3 +17,13 @@ class PaddleLocation(BaseModel):
     date: date
     notes: Optional[str]
     photo_url: Optional[str]
+
+class PaddleUpdate(BaseModel):
+    user_name: Optional[str] = None
+    event_name: Optional[str] = None
+    team: Optional[str] = None
+    location_name: Optional[str] = None
+    coordinates: Optional[Coordinates] = None
+    date: Optional[date] = None
+    notes: Optional[str] = None
+    photo_url: Optional[str] = None

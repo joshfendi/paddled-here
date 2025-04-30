@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.models import PaddleLocation
+from app.models import PaddleUpdate
 from typing import List
 from app.services import paddle_service
 
@@ -17,6 +18,13 @@ def create(paddle: PaddleLocation):
 def update(paddle_id: int, updated: PaddleLocation):
     try:
         return paddle_service.update_paddle(paddle_id, updated)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Paddle log not found")
+
+@router.patch("/paddles/{paddle_id}", response_model=PaddleLocation)
+def patch_paddle(paddle_id: int, patch: PaddleUpdate):
+    try:
+        return paddle_service.patch_paddle(paddle_id, patch)
     except ValueError:
         raise HTTPException(status_code=404, detail="Paddle log not found")
 
