@@ -1,24 +1,29 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Column, JSON
 from typing import Optional
 from datetime import date as dt_date, datetime
+from pydantic import BaseModel
 
-class Coordinates(SQLModel):
+# Use Pydantic BaseModel for nested structure
+class Coordinates(BaseModel):
     lat: float
     lng: float
 
-class PaddleLocation(SQLModel, table=True):  # 👈 makes it a SQL table
+class PaddleLocation(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     user_name: str
     event_name: str
     team: Optional[str]
     location_name: str
-    coordinates: Coordinates
+
+    # Store Coordinates as JSON in the database
+    coordinates: Coordinates = Field(sa_column=Column(JSON))
+
     date: dt_date
     notes: Optional[str]
     photo_url: Optional[str]
 
-class PaddleUpdate(SQLModel):  # no table=True = this is not a table, just used for PATCH
+class PaddleUpdate(SQLModel):
     user_name: Optional[str] = None
     event_name: Optional[str] = None
     team: Optional[str] = None

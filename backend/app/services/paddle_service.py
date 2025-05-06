@@ -1,50 +1,56 @@
-# paddle_service.py
-
 from typing import List
-from app.models import PaddleLocation
-from app.models import PaddleUpdate
-
-paddle_db: List[PaddleLocation] = []
-next_id = 1
+from sqlmodel import Session, select
+from app.db import engine
+from app.models import PaddleLocation, PaddleUpdate
 
 def get_all_paddles() -> List[PaddleLocation]:
-    return paddle_db
+    with Session(engine) as session:
+        statement = select(PaddleLocation)
+        results = session.exec(statement).all()
+        return results
 
 def create_paddle(paddle: PaddleLocation) -> PaddleLocation:
-    global next_id
-    paddle.id = next_id
-    next_id += 1
-    paddle_db.append(paddle)
-    return paddle
+    with Session(engine) as session:
+        session.add(paddle)
+        session.commit()
+        session.refresh(paddle)
+        return paddle
 
 def update_paddle(paddle_id: int, updated_paddle: PaddleLocation) -> PaddleLocation:
-    for index, paddle in enumerate(paddle_db):
-        if paddle.id == paddle_id:
-            updated_paddle.id = paddle_id
-            updated_paddle.created_at = paddle.created_at
-            paddle_db[index] = updated_paddle
-            return updated_paddle
-    raise ValueError("Paddle log not found")
+    with Session(engine) as session:
+        paddle = session.get(PaddleLocation, paddle_id)
+        if not paddle:
+            raise ValueError("Paddle log not found")
+        
+        updated_data = updated_paddle.model_dump(exclude_unset=True)
+        for key, value in updated_data.items():
+            setattr(paddle, key, value)
+
+        session.add(paddle)
+        session.commit()
+        session.refresh(paddle)
+        return paddle
 
 def patch_paddle(paddle_id: int, patch: PaddleUpdate) -> PaddleLocation:
-    for index, paddle in enumerate(paddle_db):
-        if paddle.id == paddle_id:
-            updated_data = paddle.model_dump()
-            patch_data = patch.model_dump(exclude_unset=True)
-            updated_data.update(patch_data)
+    with Session(engine) as session:
+        paddle = session.get(PaddleLocation, paddle_id)
+        if not paddle:
+            raise ValueError("Paddle log not found")
+        
+        patch_data = patch.model_dump(exclude_unset=True)
+        for key, value in patch_data.items():
+            setattr(paddle, key, value)
 
-            updated_paddle = PaddleLocation(**updated_data)
-            updated_paddle.id = paddle.id
-            updated_paddle.created_at = paddle.created_at
-
-            paddle_db[index] = updated_paddle
-            return updated_paddle
-
-    raise ValueError("Paddle log not found")
+        session.add(paddle)
+        session.commit()
+        session.refresh(paddle)
+        return paddle
 
 def delete_paddle(paddle_id: int) -> None:
-    for index, paddle in enumerate(paddle_db):
-        if paddle.id == paddle_id:
-            del paddle_db[index]
-            return
-    raise ValueError("Paddle log not found")
+    with Session(engine) as session:
+        paddle = session.get(PaddleLocation, paddle_id)
+        if not paddle:
+            raise ValueError("Paddle log not found")
+        
+        session.delete(paddle)
+        session.commit()
