@@ -3,9 +3,15 @@ from sqlmodel import Session, select
 from app.db import engine
 from app.models import PaddleLocation, PaddleUpdate
 
-def get_all_paddles() -> List[PaddleLocation]:
+def get_all_paddles(user_name: str = None, team: str = None) -> List[PaddleLocation]:
     with Session(engine) as session:
         statement = select(PaddleLocation)
+
+        if user_name:
+            statement = statement.where(PaddleLocation.user_name == user_name)
+        if team:
+            statement = statement.where(PaddleLocation.team == team)
+
         results = session.exec(statement).all()
         return results
     
