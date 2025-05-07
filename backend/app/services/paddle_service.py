@@ -8,6 +8,14 @@ def get_all_paddles() -> List[PaddleLocation]:
         statement = select(PaddleLocation)
         results = session.exec(statement).all()
         return results
+    
+def get_paddle(paddle_id: int) -> PaddleLocation:
+    with Session(engine) as session:
+        paddle = session.get(PaddleLocation, paddle_id)
+        if not paddle:
+            raise ValueError("Paddle log not found")
+        return paddle
+
 
 def create_paddle(paddle: PaddleLocation) -> PaddleLocation:
     with Session(engine) as session:

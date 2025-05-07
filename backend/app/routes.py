@@ -10,6 +10,13 @@ router = APIRouter()
 def get_all():
     return paddle_service.get_all_paddles()
 
+@router.get("/paddles/{paddle_id}", response_model=PaddleLocation)
+def get_paddle(paddle_id: int):
+    try:
+        return paddle_service.get_paddle(paddle_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Paddle log not found")
+
 @router.post("/paddles", response_model=PaddleLocation)
 def create(paddle: PaddleLocation):
     return paddle_service.create_paddle(paddle)
