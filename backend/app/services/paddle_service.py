@@ -3,7 +3,12 @@ from sqlmodel import Session, select
 from app.db import engine
 from app.models import PaddleLocation, PaddleUpdate
 
-def get_all_paddles(user_name: str = None, team: str = None) -> List[PaddleLocation]:
+def get_all_paddles(
+    user_name: str = None,
+    team: str = None,
+    sort_by: str = None,
+    desc: bool = False
+) -> List[PaddleLocation]:
     with Session(engine) as session:
         statement = select(PaddleLocation)
 
@@ -12,8 +17,15 @@ def get_all_paddles(user_name: str = None, team: str = None) -> List[PaddleLocat
         if team:
             statement = statement.where(PaddleLocation.team == team)
 
-        results = session.exec(statement).all()
-        return results
+        # Sorting logic
+        if sort_by in {"created_at", "date"}:
+            sort_column = getattr(PaddleLocation, sort_by)
+            if desc:
+                sort_column = sort_column.desc()
+            statement = statement.order_by(sort_column)
+
+        return session.exec(statement).all()
+
     
 def get_paddle(paddle_id: int) -> PaddleLocation:
     with Session(engine) as session:

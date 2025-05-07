@@ -7,8 +7,19 @@ from app.services import paddle_service
 router = APIRouter()
 
 @router.get("/paddles", response_model=List[PaddleLocation])
-def get_all(user_name: str = None, team: str = None):
-    return paddle_service.get_all_paddles(user_name=user_name, team=team)
+def get_all(
+    user_name: str = None,
+    team: str = None,
+    sort_by: str = None,
+    desc: bool = False
+):
+    return paddle_service.get_all_paddles(
+        user_name=user_name,
+        team=team,
+        sort_by=sort_by,
+        desc=desc
+    )
+
 
 @router.get("/paddles/{paddle_id}", response_model=PaddleLocation)
 def get_paddle(paddle_id: int):
