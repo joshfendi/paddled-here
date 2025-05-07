@@ -11,9 +11,9 @@ def get_all_paddles() -> List[PaddleLocation]:
 
 def create_paddle(paddle: PaddleLocation) -> PaddleLocation:
     with Session(engine) as session:
-        session.add(paddle)
-        session.commit()
-        session.refresh(paddle)
+        session.add(paddle) # stages the object for insertion
+        session.commit() # commits the staged object to the database
+        session.refresh(paddle) # refreshes the object with the latest data from the database
         return paddle
 
 def update_paddle(paddle_id: int, updated_paddle: PaddleLocation) -> PaddleLocation:
