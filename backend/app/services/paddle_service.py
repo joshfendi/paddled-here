@@ -3,11 +3,15 @@ from sqlmodel import Session, select
 from app.db import engine
 from app.models import PaddleLocation, PaddleUpdate
 
+from datetime import date
+
 def get_all_paddles(
     user_name: str = None,
     team: str = None,
     sort_by: str = None,
-    desc: bool = False
+    desc: bool = False,
+    start_date: date = None,
+    end_date: date = None,
 ) -> List[PaddleLocation]:
     with Session(engine) as session:
         statement = select(PaddleLocation)
@@ -16,8 +20,11 @@ def get_all_paddles(
             statement = statement.where(PaddleLocation.user_name == user_name)
         if team:
             statement = statement.where(PaddleLocation.team == team)
+        if start_date:
+            statement = statement.where(PaddleLocation.date >= start_date)
+        if end_date:
+            statement = statement.where(PaddleLocation.date <= end_date)
 
-        # Sorting logic
         if sort_by in {"created_at", "date"}:
             sort_column = getattr(PaddleLocation, sort_by)
             if desc:

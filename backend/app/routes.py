@@ -3,6 +3,7 @@ from app.models import PaddleLocation
 from app.models import PaddleUpdate
 from typing import List
 from app.services import paddle_service
+from datetime import date
 
 router = APIRouter()
 
@@ -11,13 +12,17 @@ def get_all(
     user_name: str = None,
     team: str = None,
     sort_by: str = None,
-    desc: bool = False
+    desc: bool = False,
+    start_date: date = None,
+    end_date: date = None,
 ):
     return paddle_service.get_all_paddles(
         user_name=user_name,
         team=team,
         sort_by=sort_by,
-        desc=desc
+        desc=desc,
+        start_date=start_date,
+        end_date=end_date,
     )
 
 
