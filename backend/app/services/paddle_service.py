@@ -12,6 +12,8 @@ def get_all_paddles(
     desc: bool = False,
     start_date: date = None,
     end_date: date = None,
+    limit: int = 10,
+    offset: int = 0
 ) -> List[PaddleLocation]:
     with Session(engine) as session:
         statement = select(PaddleLocation)
@@ -30,6 +32,9 @@ def get_all_paddles(
             if desc:
                 sort_column = sort_column.desc()
             statement = statement.order_by(sort_column)
+
+        # Pagination logic
+        statement = statement.offset(offset).limit(limit)
 
         return session.exec(statement).all()
 

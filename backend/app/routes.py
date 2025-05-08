@@ -7,6 +7,8 @@ from datetime import date
 
 router = APIRouter()
 
+from datetime import date
+
 @router.get("/paddles", response_model=List[PaddleLocation])
 def get_all(
     user_name: str = None,
@@ -15,6 +17,8 @@ def get_all(
     desc: bool = False,
     start_date: date = None,
     end_date: date = None,
+    limit: int = 10,
+    offset: int = 0
 ):
     return paddle_service.get_all_paddles(
         user_name=user_name,
@@ -23,6 +27,8 @@ def get_all(
         desc=desc,
         start_date=start_date,
         end_date=end_date,
+        limit=limit,
+        offset=offset
     )
 
 
