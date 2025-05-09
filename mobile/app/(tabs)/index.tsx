@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState<string | null>(null);
 
 type PaddleLocation = {
   id: number;
@@ -12,6 +10,8 @@ type PaddleLocation = {
 };
 
 export default function HomeScreen() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [paddles, setPaddles] = useState<PaddleLocation[]>([]);
 
   useEffect(() => {
