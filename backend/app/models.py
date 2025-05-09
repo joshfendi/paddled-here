@@ -1,13 +1,8 @@
 from sqlmodel import SQLModel, Field, Column, JSON
-from typing import Optional,List
+from typing import Optional, List
 from datetime import date as dt_date, datetime
 from pydantic import BaseModel
-from app.models import PaddleLocation
 
-class PaddlesPage(SQLModel):
-    total: int
-    results: List[PaddleLocation]
-    
 # Use Pydantic BaseModel for nested structure
 class Coordinates(BaseModel):
     lat: float
@@ -20,10 +15,7 @@ class PaddleLocation(SQLModel, table=True):
     event_name: str
     team: Optional[str]
     location_name: str
-
-    # Store Coordinates as JSON in the database
-    coordinates: Coordinates = Field(sa_column=Column(JSON))
-
+    coordinates: Coordinates = Field(sa_column=Column(JSON))  # stored as JSON
     date: dt_date
     notes: Optional[str]
     photo_url: Optional[str]
@@ -37,3 +29,8 @@ class PaddleUpdate(SQLModel):
     date: Optional[dt_date] = None
     notes: Optional[str] = None
     photo_url: Optional[str] = None
+
+# Define this AFTER PaddleLocation is declared
+class PaddlesPage(SQLModel):
+    total: int
+    results: List[PaddleLocation]

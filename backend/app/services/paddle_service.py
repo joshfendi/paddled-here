@@ -32,7 +32,8 @@ def get_all_paddles(
             base_stmt = base_stmt.where(PaddleLocation.date <= end_date)
 
         # Get total number of matching records before pagination
-        total = session.exec(base_stmt).count()
+        total = session.exec(base_stmt).all()
+        total_count = len(total)
 
         # Apply sorting if the sort_by field is valid
         if sort_by in {"created_at", "date"}:
@@ -44,12 +45,9 @@ def get_all_paddles(
         # Apply pagination by setting offset and limit
         base_stmt = base_stmt.offset(offset).limit(limit)
 
-        # Execute the query to get paginated results
-        paddles = session.exec(base_stmt).all()
-
-        # Return both the results and the total count
-        return paddles, total
-
+        # paginate in Python
+        paddles = total[offset : offset + limit]  
+        return paddles, total_count
     
 def get_paddle(paddle_id: int) -> PaddleLocation:
     with Session(engine) as session:
