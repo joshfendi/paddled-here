@@ -1,8 +1,13 @@
 from sqlmodel import SQLModel, Field, Column, JSON
-from typing import Optional
+from typing import Optional,List
 from datetime import date as dt_date, datetime
 from pydantic import BaseModel
+from app.models import PaddleLocation
 
+class PaddlesPage(SQLModel):
+    total: int
+    results: List[PaddleLocation]
+    
 # Use Pydantic BaseModel for nested structure
 class Coordinates(BaseModel):
     lat: float

@@ -1,15 +1,12 @@
 from fastapi import APIRouter, HTTPException
-from app.models import PaddleLocation
-from app.models import PaddleUpdate
-from typing import List
+from app.models import PaddleLocation, PaddleUpdate, PaddlesPage
 from app.services import paddle_service
+from typing import List
 from datetime import date
 
 router = APIRouter()
 
-from datetime import date
-
-@router.get("/paddles", response_model=List[PaddleLocation])
+@router.get("/paddles", response_model=PaddlesPage)
 def get_all(
     user_name: str = None,
     team: str = None,
@@ -20,7 +17,8 @@ def get_all(
     limit: int = 10,
     offset: int = 0
 ):
-    return paddle_service.get_all_paddles(
+    # Fetch filtered and paginated results along with the total count
+    results, total = paddle_service.get_all_paddles(
         user_name=user_name,
         team=team,
         sort_by=sort_by,
@@ -31,6 +29,8 @@ def get_all(
         offset=offset
     )
 
+    # Return structured response with pagination metadata
+    return PaddlesPage(total=total, results=results)
 
 @router.get("/paddles/{paddle_id}", response_model=PaddleLocation)
 def get_paddle(paddle_id: int):

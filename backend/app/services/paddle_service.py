@@ -5,6 +5,8 @@ from app.models import PaddleLocation, PaddleUpdate
 
 from datetime import date
 
+from typing import Tuple
+
 def get_all_paddles(
     user_name: str = None,
     team: str = None,
@@ -14,29 +16,39 @@ def get_all_paddles(
     end_date: date = None,
     limit: int = 10,
     offset: int = 0
-) -> List[PaddleLocation]:
+) -> Tuple[List[PaddleLocation], int]:
     with Session(engine) as session:
-        statement = select(PaddleLocation)
+        # Build the base SELECT statement
+        base_stmt = select(PaddleLocation)
 
+        # Apply filters based on query parameters
         if user_name:
-            statement = statement.where(PaddleLocation.user_name == user_name)
+            base_stmt = base_stmt.where(PaddleLocation.user_name == user_name)
         if team:
-            statement = statement.where(PaddleLocation.team == team)
+            base_stmt = base_stmt.where(PaddleLocation.team == team)
         if start_date:
-            statement = statement.where(PaddleLocation.date >= start_date)
+            base_stmt = base_stmt.where(PaddleLocation.date >= start_date)
         if end_date:
-            statement = statement.where(PaddleLocation.date <= end_date)
+            base_stmt = base_stmt.where(PaddleLocation.date <= end_date)
 
+        # Get total number of matching records before pagination
+        total = session.exec(base_stmt).count()
+
+        # Apply sorting if the sort_by field is valid
         if sort_by in {"created_at", "date"}:
             sort_column = getattr(PaddleLocation, sort_by)
             if desc:
                 sort_column = sort_column.desc()
-            statement = statement.order_by(sort_column)
+            base_stmt = base_stmt.order_by(sort_column)
 
-        # Pagination logic
-        statement = statement.offset(offset).limit(limit)
+        # Apply pagination by setting offset and limit
+        base_stmt = base_stmt.offset(offset).limit(limit)
 
-        return session.exec(statement).all()
+        # Execute the query to get paginated results
+        paddles = session.exec(base_stmt).all()
+
+        # Return both the results and the total count
+        return paddles, total
 
     
 def get_paddle(paddle_id: int) -> PaddleLocation:
