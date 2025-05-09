@@ -7,6 +7,7 @@ type PaddleLocation = {
   event_name: string;
   location_name: string;
   date: string;
+  team?: string // optional field
 };
 
 export default function HomeScreen() {
@@ -43,7 +44,7 @@ export default function HomeScreen() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.event}>{item.event_name}</Text>
+            <Text style={styles.event}>{item.team && <Text>{item.team} | </Text>}{item.event_name}</Text>
             <Text>{item.location_name}</Text>
             <Text>{item.date}</Text>
           </View>
