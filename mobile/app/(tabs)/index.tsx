@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
+import { useRouter } from "expo-router";
+
+const router = useRouter(); // put this at the top of your HomeScreen function
 
 type PaddleLocation = {
   id: number;
@@ -43,11 +47,13 @@ export default function HomeScreen() {
         data={paddles}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.event}>{item.team && <Text>{item.team} | </Text>}{item.event_name}</Text>
-            <Text>{item.location_name}</Text>
-            <Text>{item.date}</Text>
-          </View>
+          <Pressable onPress={() => router.push(`/editpaddle?paddleId=${item.id}`)}>
+            <View style={styles.card}>
+              <Text style={styles.event}>{item.team && <Text>{item.team} | </Text>}{item.event_name}</Text>
+              <Text>{item.location_name}</Text>
+              <Text>{item.date}</Text>
+            </View>
+          </Pressable>
         )}
       />
     </View>
