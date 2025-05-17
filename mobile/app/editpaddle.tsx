@@ -72,6 +72,20 @@ export default function editpaddle() {
         />
       ))}
       <Button title="Update" onPress={handleSubmit} />
+      <Button
+        title="Delete"
+        color="red"
+        onPress={async () => {
+          try {
+            await fetch(`http://localhost:8000/paddles/${paddleId}`, {
+              method: "DELETE",
+            });
+            router.back(); // Go back after successful delete
+          } catch (err) {
+            console.error("Delete failed:", err);
+          }
+        }}
+      />
     </View>
   );
 }
