@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 const router = useRouter(); // put this at the top of your HomeScreen function
+
 
 type PaddleLocation = {
   id: number;
@@ -19,24 +22,25 @@ export default function HomeScreen() {
   const [error, setError] = useState<string | null>(null);
   const [paddles, setPaddles] = useState<PaddleLocation[]>([]);
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchPaddles = async () => {
+      setLoading(true);
       try {
         const res = await fetch("http://localhost:8000/paddles");
         const data = await res.json();
         setPaddles(data.results);
-      }
-      catch (err) {
+      } catch (err) {
         console.error(err);
         setError("Failed to load paddles");
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchPaddles();
-  }, []);
+  }, [])
+);
 
   return (
     <View style={styles.container}>
